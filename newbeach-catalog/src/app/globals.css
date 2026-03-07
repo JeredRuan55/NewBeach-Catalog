@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-playfair: var(--font-playfair);
+  --font-outfit: var(--font-outfit);
+  
+  --color-background: #D1C0DB;
+  --color-foreground: #2A101C;
+  --color-primary-purple: #73185e;
+  --color-accent-gold: #BFA054;
+  --color-soft-lilac: #F7E7EB;
+  --color-border-gold: #D2B48C;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    /* In v4, font-outfit is automatically mapped from the theme variable */
+    @apply font-outfit; 
+  }
+}
+
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+
+.font-outfit {
+  font-family: var(--font-outfit);
+}
+
+.glass-nav {
+  @apply bg-white/70 backdrop-blur-md border-b border-[#F0E6E9];
+}
+
+.sold-out-badge {
+  @apply bg-[#F0E6E9] text-[#522138] text-[8px] uppercase tracking-widest font-bold px-2 py-1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FCF8F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #522138;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #BFA054;
+}
