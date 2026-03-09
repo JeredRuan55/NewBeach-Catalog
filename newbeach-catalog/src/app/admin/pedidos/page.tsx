@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, Eye, User, Clock, CheckCircle2, Package, Truck, Loader2 } from "lucide-react";
+import { Search, Eye, User, Clock, CheckCircle2, Package, Truck, Loader2, XCircle, AlertCircle, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { formatCurrency, getStatusLabel, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
@@ -9,14 +10,21 @@ interface Order {
   id: string;
   customer_name: string;
   total_amount: number;
-  status: 'pendente' | 'pago' | 'separando' | 'enviado' | 'concluido';
+  status: 'pendente' | 'pago' | 'separando' | 'enviado' | 'concluido' | 'cancelado';
   created_at: string;
   items: any[];
+  cancellation_reason?: string;
 }
 
 export default function AdminPedidos() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Modal State
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -49,6 +57,12 @@ export default function AdminPedidos() {
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
+    if (newStatus === 'cancelado') {
+      setSelectedOrderId(id);
+      setIsCancelModalOpen(true);
+      return;
+    }
+
     const { error } = await supabase
       .from('orders')
       .update({ status: newStatus })
@@ -59,12 +73,38 @@ export default function AdminPedidos() {
     }
   };
 
+  const confirmCancellation = async () => {
+    if (!selectedOrderId || !cancelReason.trim()) return;
+
+    setIsSubmitting(true);
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        status: 'cancelado',
+        cancellation_reason: cancelReason 
+      })
+      .eq('id', selectedOrderId);
+
+    if (!error) {
+      setOrders(prev => prev.map(o => o.id === selectedOrderId ? { 
+        ...o, 
+        status: 'cancelado', 
+        cancellation_reason: cancelReason 
+      } : o));
+      setIsCancelModalOpen(false);
+      setCancelReason("");
+      setSelectedOrderId(null);
+    }
+    setIsSubmitting(false);
+  };
+
   const statusIcons: Record<string, any> = {
     pendente: Clock,
     pago: CheckCircle2,
     separando: Package,
     enviado: Truck,
     concluido: CheckCircle2,
+    cancelado: XCircle,
   };
 
   const getStatusColor = (status: string) => {
@@ -74,6 +114,7 @@ export default function AdminPedidos() {
       separando: 'bg-blue-50 text-blue-600 border-blue-100',
       enviado: 'bg-purple-50 text-purple-600 border-purple-100',
       concluido: 'bg-zinc-100 text-zinc-500 border-zinc-200',
+      cancelado: 'bg-rose-50 text-rose-600 border-rose-100',
     };
     return colors[status] || 'bg-gray-50 text-gray-500 border-gray-100';
   };
@@ -110,7 +151,10 @@ export default function AdminPedidos() {
         {loading ? (
            <div className="py-24 text-center font-playfair italic text-[#BFA054] border border-dashed border-[#73185e]/20 rounded-[4px]">Sincronizando vendas...</div>
         ) : orders.map((order) => (
-          <div key={order.id} className="bg-white/60 backdrop-blur-sm border border-[#73185e]/10 hover:border-[#73185e]/40 transition-all group relative overflow-hidden rounded-[4px] shadow-sm">
+          <div key={order.id} className={cn(
+            "bg-white/60 backdrop-blur-sm border transition-all group relative overflow-hidden rounded-[4px] shadow-sm",
+            order.status === 'cancelado' ? "border-rose-200/50 opacity-80" : "border-[#73185e]/10 hover:border-[#73185e]/40"
+          )}>
             <div className="p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-8 flex-1 w-full">
                 <div className="flex flex-col gap-1 min-w-[120px]">
@@ -142,6 +186,17 @@ export default function AdminPedidos() {
                     {getStatusLabel(order.status)}
                   </div>
                 </div>
+
+                {order.status === 'cancelado' && order.cancellation_reason && (
+                  <div className="bg-rose-50/50 p-4 rounded border border-rose-100 flex-1 w-full md:w-auto">
+                    <p className="text-[8px] uppercase tracking-widest font-bold text-rose-500 mb-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> Motivo do Cancelamento
+                    </p>
+                    <p className="text-[11px] text-[#73185e]/80 italic font-bold uppercase tracking-widest leading-relaxed">
+                      "{order.cancellation_reason}"
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-4 w-full lg:w-auto">
@@ -156,6 +211,7 @@ export default function AdminPedidos() {
                     <option value="separando">Separando</option>
                     <option value="enviado">Enviado</option>
                     <option value="concluido">Concluído</option>
+                    <option value="cancelado">CANCELAR PEDIDO</option>
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
                     <Clock className="w-3 h-3 text-[#73185e]" />
@@ -178,6 +234,55 @@ export default function AdminPedidos() {
           </div>
         )}
       </div>
+
+      {/* Cancellation Modal */}
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#D1C0DB] w-full max-w-md p-8 rounded shadow-2xl border border-white/20 relative"
+          >
+            <button 
+              onClick={() => setIsCancelModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-[#73185e]/40 hover:text-[#73185e] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <header className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tighter text-[#73185e]">Cancelar <span className="font-playfair italic font-normal text-[#BFA054]">Pedido</span></h2>
+              <p className="text-[10px] uppercase tracking-widest font-bold text-[#73185e]/60 mt-2">Explique por que esta joia não será entregue.</p>
+            </header>
+
+            <div className="space-y-4">
+              <label className="text-[10px] uppercase tracking-widest font-bold text-[#73185e]">Motivo do Cancelamento</label>
+              <textarea 
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Ex: Produto com defeito no lote, cliente desistiu, erro no estoque..."
+                className="w-full bg-white/60 border border-[#73185e]/10 p-6 min-h-[120px] outline-none focus:ring-1 focus:ring-rose-400 text-[11px] font-bold uppercase tracking-widest rounded-[2px] transition-all"
+              />
+            </div>
+
+            <div className="mt-10 flex gap-4">
+              <button 
+                onClick={() => setIsCancelModalOpen(false)}
+                className="flex-1 py-4 text-[10px] uppercase tracking-widest font-bold text-[#73185e]/60 hover:text-[#73185e] transition-colors"
+              >
+                Voltar
+              </button>
+              <button 
+                onClick={confirmCancellation}
+                disabled={isSubmitting || !cancelReason.trim()}
+                className="flex-[2] py-4 bg-rose-600 text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 disabled:opacity-50 rounded-[2px] flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirmar Cancelamento"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ export const getStatusLabel = (status: string) => {
     separando: "Em Separação",
     enviado: "Enviado",
     concluido: "Concluído",
+    cancelado: "Cancelado",
   };
   return statusMap[status] || status;
 };
