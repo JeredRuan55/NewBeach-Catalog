@@ -51,15 +51,15 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
+      const finalTotal = (totalPrice * (paymentMethod === 'pix' ? 0.95 : 1)) + shippingFee;
+
       const orderData = {
         customer_name: formData.name,
         customer_email: formData.email,
         customer_whatsapp: formData.whatsapp,
-        total_amount: totalPrice + shippingFee,
+        total_amount: finalTotal,
         status: 'pendente',
         items: cart,
-        // Using a single field for address string since we didn't update the schema yet
-        // but it's better to store as JSON in a new field or metadata
         shipping_address: formData.address,
         payment_method: paymentMethod
       };
@@ -72,8 +72,9 @@ export default function CheckoutPage() {
       if (error) throw error;
 
       // Logic for success navigation
+      const orderId = data[0].id;
       clearCart();
-      router.push('/checkout/sucesso');
+      router.push(`/checkout/sucesso?id=${orderId}&total=${finalTotal}`);
     } catch (err) {
       console.error(err);
       alert("Ocorreu um erro ao processar seu pedido. Por favor, tente novamente.");
