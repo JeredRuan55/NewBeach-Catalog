@@ -30,27 +30,41 @@
 }
 
 .glass-nav {
-  @apply bg-white/70 backdrop-blur-md border-b border-[#F0E6E9];
+  @apply bg-white/40 backdrop-blur-xl border-b border-[#73185e]/5;
+}
+
+.glass-card {
+  @apply bg-white/60 backdrop-blur-sm border border-[#73185e]/10;
 }
 
 .sold-out-badge {
-  @apply bg-[#F0E6E9] text-[#522138] text-[8px] uppercase tracking-widest font-bold px-2 py-1;
+  @apply bg-[#73185e] text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-sm;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar for Luxury Effect */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FCF8F9;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #522138;
-  border-radius: 10px;
+  background: #73185e;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #BFA054;
+}
+
+/* Animations */
+@keyframes luxury-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-luxury {
+  animation: luxury-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

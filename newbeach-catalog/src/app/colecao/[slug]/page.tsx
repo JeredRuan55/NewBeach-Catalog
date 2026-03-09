@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Filter, SlidersHorizontal } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { useCart } from "@/context/CartContext";
 
 interface Product {
   id: string;
@@ -43,26 +44,18 @@ export default function CollectionPage() {
     fetchProducts();
   }, [slug]);
 
-  const handleCheckout = async (product: Product) => {
+  const { addItem } = useCart();
+
+  const handleAddToCart = (product: Product) => {
     if (product.stock_status === 'sold_out') return;
-
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([
-        {
-          customer_name: "Cliente Simulado",
-          customer_email: "cliente@exemplo.com",
-          total_amount: product.price,
-          status: 'pendente',
-          items: [{ id: product.id, name: product.name, price: product.price }]
-        }
-      ]);
-
-    if (!error) {
-       alert(`Pedido Realizado! Acompanhe no Admin: #${product.name}`);
-    } else {
-       alert("Erro ao processar pedido: Verifique o RLS no Supabase");
-    }
+    
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images?.[0] || 'https://via.placeholder.com/300x400',
+      quantity: 1
+    });
   };
 
   return (
@@ -125,7 +118,7 @@ export default function CollectionPage() {
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleCheckout(product);
+                    handleAddToCart(product);
                   }}
                   disabled={product.stock_status === 'sold_out'}
                   className={`w-full py-3 text-[10px] uppercase tracking-widest font-bold transition-all shadow-xl ${

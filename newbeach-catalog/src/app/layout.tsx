@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   keywords: ["moda feminina", "linho", "alfaiataria", "clean girl aesthetic", "roupas minimalistas"],
 };
 
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/client/CartDrawer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,8 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${outfit.variable} ${playfair.variable} antialiased`}>
-        {children}
+      <body className={`${outfit.variable} ${playfair.variable} antialiased bg-[#D1C0DB]`}>
+        <CartProvider>
+          <CartDrawer />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );
