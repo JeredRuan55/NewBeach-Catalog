@@ -13,7 +13,7 @@ function SuccessContent() {
   const orderId = searchParams.get('id') || '0000';
   const total = searchParams.get('total') || '0.00';
   
-  const pixKey = "financeiro@newbeach.com.br"; // Chave exemplo
+  const pixKey = "6d7f4ff2-2806-487e-84dd-1f7d73ab7e76"; // Chave Aleatória
 
   // Simulating a BRCode/PIX Copy-Paste (Simplified version for demonstration)
   // Real implementaton would need a more complex generator for valid PIX
