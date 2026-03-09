@@ -10,6 +10,14 @@ export interface CartItem {
   quantity: number;
 }
 
+interface ShippingAddress {
+  cep: string;
+  logradouro: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+}
+
 interface CartContextType {
   cart: CartItem[];
   addItem: (item: CartItem) => void;
@@ -22,6 +30,11 @@ interface CartContextType {
   toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  // Shipping
+  shippingFee: number;
+  shippingAddress: ShippingAddress | null;
+  setShipping: (address: ShippingAddress, fee: number) => void;
+  clearShipping: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -29,16 +42,26 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress | null>(null);
 
-  // Load cart from localStorage on mount
+  // Load cart and shipping from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('newbeach-cart');
+    const savedShipping = localStorage.getItem('newbeach-shipping');
+    
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart", e);
-      }
+      } catch (e) { console.error("Failed to parse cart", e); }
+    }
+
+    if (savedShipping) {
+      try {
+        const parsed = JSON.parse(savedShipping);
+        setShippingAddress(parsed.address);
+        setShippingFee(parsed.fee);
+      } catch (e) { console.error("Failed to parse shipping", e); }
     }
   }, []);
 
@@ -46,6 +69,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('newbeach-cart', JSON.stringify(cart));
   }, [cart]);
+
+  // Save shipping to localStorage on change
+  useEffect(() => {
+    if (shippingAddress) {
+      localStorage.setItem('newbeach-shipping', JSON.stringify({
+        address: shippingAddress,
+        fee: shippingFee
+      }));
+    } else {
+      localStorage.removeItem('newbeach-shipping');
+    }
+  }, [shippingAddress, shippingFee]);
 
   const addItem = (item: CartItem) => {
     setCart(currentCart => {
@@ -57,7 +92,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...currentCart, item];
     });
-    setIsOpen(true); // Open cart when item is added
+    setIsOpen(true);
   };
 
   const removeItem = (id: string) => {
@@ -74,8 +109,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    clearShipping();
+  };
   
+  const setShipping = (address: ShippingAddress, fee: number) => {
+    setShippingAddress(address);
+    setShippingFee(fee);
+  };
+
+  const clearShipping = () => {
+    setShippingAddress(null);
+    setShippingFee(0);
+  };
+
   const toggleCart = () => setIsOpen(!isOpen);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -86,7 +134,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <CartContext.Provider value={{ 
       cart, addItem, removeItem, updateQuantity, clearCart, 
-      totalItems, totalPrice, isOpen, toggleCart, openCart, closeCart 
+      totalItems, totalPrice, isOpen, toggleCart, openCart, closeCart,
+      shippingFee, shippingAddress, setShipping, clearShipping
     }}>
       {children}
     </CartContext.Provider>

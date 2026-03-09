@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, Eye, User, Clock, CheckCircle2, Package, Truck, Loader2, XCircle, AlertCircle, X } from "lucide-react";
+import { Search, Eye, User, Clock, CheckCircle2, Package, Truck, Loader2, XCircle, AlertCircle, X, QrCode } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency, getStatusLabel, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -196,7 +196,42 @@ export default function AdminPedidos() {
                       "{order.cancellation_reason}"
                     </p>
                   </div>
-                )}
+                )}                <div className="flex flex-col gap-2 flex-1">
+                  <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/30">Status Local</span>
+                  <div className={cn(
+                    "flex items-center gap-2 px-4 py-1 text-[8px] uppercase tracking-[0.2em] font-bold border rounded-full w-fit",
+                    getStatusColor(order.status)
+                  )}>
+                    {React.createElement(statusIcons[order.status] || Clock, { className: "w-3 h-3" })}
+                    {getStatusLabel(order.status)}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 flex-1 border-l border-[#73185e]/10 pl-12">
+                  <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/30">Pagamento</span>
+                  {(order as any).payment_method === 'pix' ? (
+                    <div className="flex items-center gap-2 text-[#BFA054]">
+                       <QrCode className="w-4 h-4" />
+                       <span className="text-[9px] uppercase tracking-widest font-bold">PIX Direto</span>
+                    </div>
+                  ) : (
+                    <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60 italic font-normal">WhatsApp</span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 flex-1 border-l border-[#73185e]/10 pl-12 hidden md:flex">
+                  <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/30">Destino</span>
+                  {(order as any).shipping_address ? (
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] uppercase font-bold text-[#73185e]">{(order as any).shipping_address.localidade}/{(order as any).shipping_address.uf}</p>
+                      <p className="text-[8px] text-[#73185e]/40 font-bold tracking-widest uppercase truncate max-w-[150px]">
+                        {(order as any).shipping_address.logradouro}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-[9px] uppercase font-bold text-[#73185e]/40 italic font-normal">Não informado</span>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-4 w-full lg:w-auto">
