@@ -15,34 +15,49 @@ function SuccessContent() {
   
   const pixKey = "6d7f4ff2-2806-487e-84dd-1f7d73ab7e76"; // Chave Aleatória
 
-  // Função para gerar o payload do PIX (Padrão BRCode estático simplificado)
+  // Função para calcular o CRC16 (requerido para o PIX ser válido)
+  const calcCRC16 = (payload: string) => {
+    let result = 0xFFFF;
+    const len = payload.length;
+
+    for (let i = 0; i < len; i++) {
+        result ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+            if (result & 0x8000) result = (result << 1) ^ 0x1021;
+            else result <<= 1;
+            result &= 0xFFFF;
+        }
+    }
+    return result.toString(16).toUpperCase().padStart(4, '0');
+  };
+
+  // Função para gerar o payload do PIX (Padrão BRCode completo)
   const generatePixPayload = (key: string, amount: string) => {
     const formattedAmount = parseFloat(amount).toFixed(2);
-    
-    // Partes fixas do payload PIX
-    const merchantName = "NEWBEACH CATALOG";
+    const merchantName = "NEWBEACH";
     const merchantCity = "SAO PAULO";
-    
-    // Construção do payload (simplificada para demonstração, mas funcional para preencher valor)
-    // ID 00 (Payload Format Indicator): 000201
-    // ID 26 (Merchant Account Information): 0014BR.GOV.BCB.PIX + 01 + [tamanho da chave] + [chave]
-    const keyPart = `0014BR.GOV.BCB.PIX0114${key}`; // Assume chave aleatória de 32 a 36 caracteres
-    // Nota: O tamanho '14' acima é fixo para o domínio, precisaria ser dinâmico para chaves reais perfeitas.
-    
-    // Vamos usar uma estrutura BRCode padrão que bancos brasileiros reconhecem
-    const payload = [
-      "000201", // Versão do Payload
-      "26", keyPart.length.toString().padStart(2, '0'), keyPart, // Dados da conta
-      "52040000", // Categoria (Geral)
-      "5303986", // Moeda (BRL)
-      "54", formattedAmount.length.toString().padStart(2, '0'), formattedAmount, // Valor do Pedido
-      "5802BR", // País
-      "59", merchantName.length.toString().padStart(2, '0'), merchantName, // Nome do Recebedor
-      "60", merchantCity.length.toString().padStart(2, '0'), merchantCity, // Cidade
-      "62070503***", // Campo 62: Identificador (*** para automático)
-      "6304" // Início do CRC16
-    ].join('');
-    
+
+    // Subcampos do Merchant Account Information (ID 26)
+    const gui = "0014BR.GOV.BCB.PIX";
+    const keySubfield = `01${key.length.toString().padStart(2, '0')}${key}`;
+    const merchantAccountInfo = `${gui}${keySubfield}`;
+
+    const blocks = [
+      { id: '00', val: '01' }, // Payload Format Indicator
+      { id: '26', val: merchantAccountInfo }, // Merchant Account Information
+      { id: '52', val: '0000' }, // Merchant Category Code
+      { id: '53', val: '986' }, // Transaction Currency (BRL)
+      { id: '54', val: formattedAmount }, // Transaction Amount
+      { id: '58', val: 'BR' }, // Country Code
+      { id: '59', val: merchantName }, // Merchant Name
+      { id: '60', val: merchantCity }, // Merchant City
+      { id: '62', val: '0503***' }, // Additional Data Field (ID 05: Transaction ID)
+    ];
+
+    let payload = blocks.map(b => `${b.id}${b.val.length.toString().padStart(2, '0')}${b.val}`).join('');
+    payload += "6304"; // ID 63 (CRC16) e tamanho 04
+    payload += calcCRC16(payload);
+
     return payload;
   };
 
