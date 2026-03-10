@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Filter, MoreHorizontal, Power, PowerOff } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Power, PowerOff, Star } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import LinkNext from "next/link";
@@ -13,6 +13,7 @@ interface Product {
   category_id: string;
   stock_status: 'available' | 'sold_out';
   images: string[];
+  is_featured: boolean;
   categories?: { name: string };
 }
 
@@ -44,6 +45,20 @@ export default function AdminEstoque() {
     if (!error) {
       setProducts(prev => prev.map(p => 
         p.id === id ? { ...p, stock_status: newStatus as any } : p
+      ));
+    }
+  };
+
+  const toggleFeatured = async (id: string, currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+    const { error } = await supabase
+      .from('products')
+      .update({ is_featured: newStatus })
+      .eq('id', id);
+
+    if (!error) {
+      setProducts(prev => prev.map(p => 
+        p.id === id ? { ...p, is_featured: newStatus } : p
       ));
     }
   };
@@ -87,6 +102,7 @@ export default function AdminEstoque() {
                 <th className="px-8 py-5">Peça</th>
                 <th className="px-8 py-5">Categoria</th>
                 <th className="px-8 py-5">Preço</th>
+                <th className="px-8 py-5 text-center">Home/Destaque</th>
                 <th className="px-8 py-5">Venda Ativa</th>
                 <th className="px-8 py-5 text-right">Ações</th>
               </tr>
@@ -99,7 +115,10 @@ export default function AdminEstoque() {
                       <div className="w-12 h-16 bg-white flex items-center justify-center p-1 shadow-sm border border-[#73185e]/5">
                         {p.images?.[0] ? <img src={p.images[0]} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" /> : <div className="text-[8px] text-[#BFA054] font-serif">NB</div>}
                       </div>
-                      <span className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">{p.name}</span>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">{p.name}</span>
+                        {p.is_featured && <span className="text-[8px] text-[#BFA054] uppercase tracking-widest font-bold mt-1">★ Em Destaque</span>}
+                      </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
@@ -107,6 +126,17 @@ export default function AdminEstoque() {
                   </td>
                   <td className="px-8 py-6">
                     <span className="text-[12px] font-playfair italic font-bold text-[#BFA054]">{formatCurrency(p.price)}</span>
+                  </td>
+                  <td className="px-8 py-6 text-center">
+                    <button 
+                      onClick={() => toggleFeatured(p.id, p.is_featured)}
+                      className={cn(
+                        "p-3 rounded-full border transition-all inline-flex",
+                        p.is_featured ? "bg-[#BFA054]/10 border-[#BFA054]/30 text-[#BFA054]" : "border-[#73185e]/5 text-[#73185e]/20 hover:text-[#73185e]/40"
+                      )}
+                    >
+                      <Star className={cn("w-4 h-4", p.is_featured && "fill-current")} />
+                    </button>
                   </td>
                   <td className="px-8 py-6">
                     <button 
@@ -130,7 +160,7 @@ export default function AdminEstoque() {
 
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-24 text-center">
+                  <td colSpan={6} className="p-24 text-center">
                     <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#BFA054] mb-2">Curadoria Vazia</div>
                     <p className="text-[#73185e]/40 text-[11px] uppercase tracking-widest font-bold">O seu banco de dados está pronto para novas peças.</p>
                   </td>
