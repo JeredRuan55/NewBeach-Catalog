@@ -155,9 +155,9 @@ export default function AdminEstoque() {
                   <td className="px-8 py-6 text-right">
                     <LinkNext 
                       href={`/admin/estoque/${p.id}`}
-                      className="inline-flex items-center gap-2 text-[#73185e]/40 hover:text-[#73185e] transition-colors text-[9px] uppercase tracking-widest font-bold"
+                      className="inline-flex items-center gap-2 bg-[#73185e]/5 text-[#73185e] px-4 py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-[#73185e] hover:text-white transition-all rounded-[2px]"
                     >
-                      <Pencil className="w-4 h-4" /> Editar
+                      <Pencil className="w-3 h-3" /> Editar
                     </LinkNext>
                   </td>
                 </tr>
