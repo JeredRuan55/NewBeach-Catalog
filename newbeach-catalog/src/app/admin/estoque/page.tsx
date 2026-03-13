@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Filter, Pencil, Power, PowerOff, Star } from "lucide-react";
+import { Plus, Search, Filter, Pencil, Power, PowerOff, Star, MoreHorizontal } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import LinkNext from "next/link";
@@ -153,12 +153,32 @@ export default function AdminEstoque() {
                     </button>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <LinkNext 
-                      href={`/admin/estoque/${p.id}`}
-                      className="inline-flex items-center gap-2 bg-[#73185e]/5 text-[#73185e] px-4 py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-[#73185e] hover:text-white transition-all rounded-[2px]"
-                    >
-                      <Pencil className="w-3 h-3" /> Editar
-                    </LinkNext>
+                    <div className="relative inline-block text-left group/menu">
+                      <button className="p-2 text-[#73185e]/40 hover:text-[#73185e] transition-colors">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                      
+                      <div className="absolute right-0 mt-2 w-48 bg-white border border-[#73185e]/10 shadow-xl rounded-[4px] opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-50 overflow-hidden">
+                        <LinkNext 
+                          href={`/admin/estoque/${p.id}`}
+                          className="flex items-center gap-3 px-4 py-3 text-[10px] uppercase tracking-widest font-bold text-[#73185e] hover:bg-[#73185e]/5 transition-colors"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-[#BFA054]" />
+                          Editar Peça
+                        </LinkNext>
+                        <button 
+                          className="w-full flex items-center gap-3 px-4 py-3 text-[10px] uppercase tracking-widest font-bold text-rose-600 hover:bg-rose-50 transition-colors border-t border-[#73185e]/5"
+                          onClick={() => {
+                            if(confirm("Deseja excluir este produto?")) {
+                               supabase.from('products').delete().eq('id', p.id).then(() => fetchProducts());
+                            }
+                          }}
+                        >
+                          <Pencil className="w-3.5 h-3.5 rotate-45" />
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ))}

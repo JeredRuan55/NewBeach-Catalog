@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, Camera, Loader2, CheckCircle, Save, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import LinkNext from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface Category {
