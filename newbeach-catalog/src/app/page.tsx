@@ -98,7 +98,7 @@ export default function Home() {
           transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
           className="text-[9px] uppercase tracking-[0.4em] font-bold text-white whitespace-nowrap"
         >
-          FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 500 — ENVIAMOS PARA TODO O BRASIL — 5% OFF NO PIX — CURADORIA EXCLUSIVA NEWBEACH
+          ENVIAMOS PARA TODO O BRASIL — 5% OFF NO PIX — CURADORIA EXCLUSIVA NEWBEACH
         </motion.p>
       </div>
 
@@ -309,9 +309,9 @@ export default function Home() {
                   </div>
                   <div className="pt-2 flex justify-between items-center group-hover:px-2 transition-all">
                     <div>
-                        <h3 className="text-2xl font-bold tracking-tight uppercase text-[#73185e]">{cat.name}</h3>
-                        <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#73185e]/40 mt-1">{cat.desc}</p>
-                    </div>
+                         <h3 className="text-2xl font-bold tracking-tight uppercase text-[#73185e]">{cat.name}</h3>
+                         <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#73185e]/40 mt-1">{cat.desc}</p>
+                     </div>
                     <ArrowRight className="w-5 h-5 text-[#BFA054] -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
                   </div>
                 </motion.div>

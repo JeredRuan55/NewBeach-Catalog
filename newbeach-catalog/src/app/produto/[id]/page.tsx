@@ -311,7 +311,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </>
                      )}
                   </button>
-                  <p className="text-[9px] text-center uppercase tracking-widest font-bold text-[#73185e]/40">✈ Frete Grátis para compras acima de R$ 500</p>
                </div>
             </div>
          </div>
