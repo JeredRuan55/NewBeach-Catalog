@@ -45,6 +45,7 @@ export default function AdminEditarProduto({ params }: { params: Promise<{ id: s
   const [stockStatus, setStockStatus] = useState<'available' | 'sold_out'>('available');
   const [sizes, setSizes] = useState<Size[]>([]);
   const [materials, setMaterials] = useState<string[]>([]);
+  const [newMaterial, setNewMaterial] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [colors, setColors] = useState<Color[]>([]);
 
@@ -537,6 +538,46 @@ export default function AdminEditarProduto({ params }: { params: Promise<{ id: s
                      </div>
                    ))}
                 </div>
+             </div>
+          </div>
+
+          {/* Section 4: Materials Tags */}
+          <div className="bg-white/40 backdrop-blur-sm p-8 border border-[#73185e]/10 rounded-[4px] space-y-8">
+             <div className="flex items-center gap-4 border-b border-[#73185e]/5 pb-4">
+                <CheckCircle className="w-5 h-5 text-[#BFA054]" />
+                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#73185e]">Tags de Composição (Opcional)</h3>
+             </div>
+
+             <div className="flex gap-4">
+                <input 
+                  value={newMaterial}
+                  onChange={(e) => setNewMaterial(e.target.value)}
+                  className="flex-1 px-4 py-3 bg-white/60 border border-transparent outline-none focus:ring-1 focus:ring-[#73185e] text-[10px] uppercase font-bold tracking-widest rounded-[2px]" 
+                  placeholder="Ex: Marrant, Linho 100%"
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    if (newMaterial) {
+                      setMaterials([...materials, newMaterial]);
+                      setNewMaterial("");
+                    }
+                  }}
+                  className="px-6 bg-[#73185e] text-white text-[9px] uppercase font-bold tracking-widest rounded-[2px]"
+                >
+                  Adicionar Tag
+                </button>
+             </div>
+
+             <div className="flex flex-wrap gap-2">
+                {materials.map((m, i) => (
+                  <span key={i} className="flex items-center gap-2 bg-white px-3 py-1.5 border border-[#73185e]/10 rounded-full text-[9px] uppercase font-bold text-[#73185e]">
+                    {m}
+                    <button type="button" onClick={() => setMaterials(materials.filter((_, idx) => idx !== i))} className="text-rose-500">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
              </div>
           </div>
 
