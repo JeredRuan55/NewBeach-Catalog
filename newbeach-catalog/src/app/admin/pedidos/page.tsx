@@ -196,16 +196,7 @@ export default function AdminPedidos() {
                       "{order.cancellation_reason}"
                     </p>
                   </div>
-                )}                <div className="flex flex-col gap-2 flex-1">
-                  <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/30">Status Local</span>
-                  <div className={cn(
-                    "flex items-center gap-2 px-4 py-1 text-[8px] uppercase tracking-[0.2em] font-bold border rounded-full w-fit",
-                    getStatusColor(order.status)
-                  )}>
-                    {React.createElement(statusIcons[order.status] || Clock, { className: "w-3 h-3" })}
-                    {getStatusLabel(order.status)}
-                  </div>
-                </div>
+                )}
 
                 <div className="flex flex-col gap-2 flex-1 border-l border-[#73185e]/10 pl-12">
                   <span className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/30">Pagamento</span>
@@ -252,7 +243,16 @@ export default function AdminPedidos() {
                     <Clock className="w-3 h-3 text-[#73185e]" />
                   </div>
                 </div>
-                <button className="p-4 bg-[#73185e] text-white hover:bg-[#5D134B] transition-all rounded-[2px] shadow-lg shadow-[#73185e]/20">
+                {order.status !== 'cancelado' && (
+                  <button 
+                    onClick={() => updateStatus(order.id, 'cancelado')}
+                    className="p-4 bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all rounded-[2px] border border-rose-200"
+                    title="Cancelar Pedido"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                )}
+                <button className="p-4 bg-[#73185e] text-white hover:bg-[#5D134B] transition-all rounded-[2px] shadow-lg shadow-[#73185e]/20" title="Ver Detalhes">
                   <Eye className="w-4 h-4" />
                 </button>
               </div>
