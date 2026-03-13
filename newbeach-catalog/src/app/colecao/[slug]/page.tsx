@@ -5,9 +5,10 @@ import { useParams } from "next/navigation";
 import { Navbar } from "@/components/client/Navbar";
 import { motion } from "framer-motion";
 import { Filter, SlidersHorizontal } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/context/CartContext";
+import { ProductCard } from "@/components/client/ProductCard";
 
 interface Product {
   id: string;
@@ -16,6 +17,8 @@ interface Product {
   stock_status: 'available' | 'sold_out';
   images: string[];
   categories?: { slug: string };
+  colors?: { label: string; hex: string; imageUrl?: string; isAvailable?: boolean }[];
+  sizes?: { label: string; isAvailable?: boolean }[];
 }
 
 export default function CollectionPage() {
@@ -87,60 +90,13 @@ export default function CollectionPage() {
             Buscando peças da NewBeach...
           </div>
         ) : products.map((product, i) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="group cursor-pointer relative"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden bg-white border border-[#F0E6E9] mb-4 group-hover:border-[#BFA054]/30 transition-all">
-              {product.images?.[0] ? (
-                 <img 
-                 src={product.images[0]} 
-                 alt={product.name}
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
-               />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-[#F7E7EB] opacity-40">
-                   <div className="text-[10px] font-bold tracking-[0.3em] text-[#73185e]">NEWBEACH</div>
-                   <div className="text-[8px] uppercase text-[#BFA054] font-bold pt-1">Peça Exclusiva</div>
-                </div>
-              )}
-             
-              {product.stock_status === 'sold_out' && (
-                <div className="absolute top-4 left-4 sold-out-badge !bg-[#73185e] !text-white">
-                  Esgotado
-                </div>
-              )}
-              {/* Quick Add */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(product);
-                  }}
-                  disabled={product.stock_status === 'sold_out'}
-                  className={`w-full py-3 text-[10px] uppercase tracking-widest font-bold transition-all shadow-xl ${
-                    product.stock_status === 'sold_out' 
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                    : 'bg-[#73185e] text-white hover:bg-[#5D134B]'
-                  }`}
-                >
-                  {product.stock_status === 'sold_out' ? 'Indisponível' : 'Comprar Agora'}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#73185e]">
-                {product.name}
-              </h3>
-              <p className="text-sm font-playfair italic text-[#BFA054]">
-                {formatCurrency(product.price)}
-              </p>
-            </div>
-          </motion.div>
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            index={i} 
+            onAddToCart={() => handleAddToCart(product)}
+            stockStatus={product.stock_status}
+          />
         ))}
 
         {!loading && products.length === 0 && (

@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
+import { ProductCard } from "@/components/client/ProductCard";
 
 interface Campaign {
   id: string;
@@ -34,6 +35,8 @@ interface Product {
   images: string[];
   slug?: string;
   is_featured: boolean;
+  colors?: { label: string; hex: string; imageUrl?: string; isAvailable?: boolean }[];
+  sizes?: { label: string; isAvailable?: boolean }[];
 }
 
 export default function Home() {
@@ -214,31 +217,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
             {featuredProducts.length > 0 ? (
               featuredProducts.map((product, i) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.8 }}
-                  className="group cursor-pointer"
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden mb-8 bg-white shadow-2xl shadow-black/5">
-                    <img 
-                      src={product.images[0]} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" 
-                    />
-                    <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-all duration-700 bg-white/90 backdrop-blur-md">
-                       <button className="w-full py-4 bg-[#73185e] text-white text-[9px] uppercase tracking-[0.3em] font-bold">
-                          Adicionar à Sacola
-                       </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-center">
-                    <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#73185e]">{product.name}</h3>
-                    <p className="text-sm font-bold text-[#BFA054] font-playfair italic">{formatCurrency(product.price)}</p>
-                  </div>
-                </motion.div>
+                <ProductCard key={product.id} product={product} index={i} />
               ))
             ) : (
                 [1,2,3,4].map((n) => (

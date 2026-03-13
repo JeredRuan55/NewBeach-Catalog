@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Camera, Loader2, CheckCircle, Plus, X, Palette } from "lucide-react";
+import { ChevronLeft, Camera, Loader2, CheckCircle, Plus, X, Palette, Image as ImageIcon, Ruler } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import LinkNext from "next/link";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,13 @@ interface Category {
 interface Color {
   label: string;
   hex: string;
+  imageUrl?: string;
+  isAvailable: boolean;
+}
+
+interface Size {
+  label: string;
+  isAvailable: boolean;
 }
 
 export default function AdminNovoProduto() {
@@ -31,13 +38,22 @@ export default function AdminNovoProduto() {
   const [categoryId, setCategoryId] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [stockStatus, setStockStatus] = useState<'available' | 'sold_out'>('available');
-  const [sizes, setSizes] = useState<string[]>(["P", "M", "G"]);
+  const [sizes, setSizes] = useState<Size[]>([
+    { label: "P", isAvailable: true },
+    { label: "M", isAvailable: true },
+    { label: "G", isAvailable: true }
+  ]);
   const [materials, setMaterials] = useState<string[]>(["Linho 100%"]);
   const [colors, setColors] = useState<Color[]>([]);
   
   // Color input state
   const [newColorLabel, setNewColorLabel] = useState("");
   const [newColorHex, setNewColorHex] = useState("#73185e");
+  const [newColorImageUrl, setNewColorImageUrl] = useState("");
+  const [uploadingColorImage, setUploadingColorImage] = useState(false);
+
+  // Size input state
+  const [newSizeLabel, setNewSizeLabel] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -55,12 +71,35 @@ export default function AdminNovoProduto() {
 
   const addColor = () => {
     if (!newColorLabel) return;
-    setColors([...colors, { label: newColorLabel, hex: newColorHex }]);
+    setColors([...colors, { label: newColorLabel, hex: newColorHex, imageUrl: newColorImageUrl || undefined, isAvailable: true }]);
     setNewColorLabel("");
+    setNewColorImageUrl("");
+  };
+
+  const toggleColorAvailability = (index: number) => {
+    const updatedColors = [...colors];
+    updatedColors[index].isAvailable = !updatedColors[index].isAvailable;
+    setColors(updatedColors);
   };
 
   const removeColor = (index: number) => {
     setColors(colors.filter((_, i) => i !== index));
+  };
+
+  const addSize = () => {
+    if (!newSizeLabel) return;
+    setSizes([...sizes, { label: newSizeLabel.toUpperCase(), isAvailable: true }]);
+    setNewSizeLabel("");
+  };
+
+  const toggleSizeAvailability = (index: number) => {
+    const updatedSizes = [...sizes];
+    updatedSizes[index].isAvailable = !updatedSizes[index].isAvailable;
+    setSizes(updatedSizes);
+  };
+
+  const removeSize = (index: number) => {
+    setSizes(sizes.filter((_, i) => i !== index));
   };
 
   const removeImage = (index: number) => {
@@ -103,12 +142,15 @@ export default function AdminNovoProduto() {
 
   const [uploading, setUploading] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const colorImageInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, target: 'main' | 'color') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
+    if (target === 'main') setUploading(true);
+    else setUploadingColorImage(true);
+
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -124,12 +166,17 @@ export default function AdminNovoProduto() {
         .from('newbeach-assets')
         .getPublicUrl(filePath);
 
-      setImageUrls([...imageUrls, publicUrl]);
+      if (target === 'main') {
+        setImageUrls([...imageUrls, publicUrl]);
+      } else {
+        setNewColorImageUrl(publicUrl);
+      }
     } catch (err: any) {
       console.error('Upload error:', err);
       alert("Erro no upload. Tente usar um link externo.");
     } finally {
-      setUploading(false);
+      if (target === 'main') setUploading(false);
+      else setUploadingColorImage(false);
     }
   };
 
@@ -201,13 +248,12 @@ export default function AdminNovoProduto() {
             <input 
               type="file"
               ref={fileInputRef}
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e, 'main')}
               accept="image/*"
               className="hidden"
             />
           </div>
 
-          {/* Quick External Link */}
           <div className="space-y-2">
             <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/40">Link Externo Direto</label>
             <div className="flex gap-2">
@@ -291,65 +337,96 @@ export default function AdminNovoProduto() {
              </div>
           </div>
 
-          {/* Section 2: Colors & Variations */}
+          {/* Section 2: Colors & Availability */}
           <div className="bg-white/40 backdrop-blur-sm p-8 border border-[#73185e]/10 rounded-[4px] space-y-8">
              <div className="flex items-center gap-4 border-b border-[#73185e]/5 pb-4">
                 <Palette className="w-5 h-5 text-[#BFA054]" />
-                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#73185e]">Cores e Variações</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#73185e]">Estoque por Cores</h3>
              </div>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {/* Add Color UI */}
                 <div className="space-y-6">
                    <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-2">
-                         <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Nome da Cor</label>
+                         <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Nova Cor</label>
                          <input 
                            value={newColorLabel}
                            onChange={(e) => setNewColorLabel(e.target.value)}
                            className="w-full px-4 py-3 bg-white/60 border border-transparent outline-none focus:ring-1 focus:ring-[#73185e] text-[10px] uppercase font-bold tracking-widest rounded-[2px]" 
-                           placeholder="Ex: Cru, Preto, Terracota"
+                           placeholder="Ex: Cru, Preto"
                          />
                       </div>
+                      
                       <div className="space-y-2">
-                         <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Selecione o Tom</label>
-                         <div className="flex gap-4">
-                            <input 
-                              type="color" 
-                              value={newColorHex}
-                              onChange={(e) => setNewColorHex(e.target.value)}
-                              className="w-16 h-12 bg-transparent border-none p-0 cursor-pointer overflow-hidden rounded-[2px]"
-                            />
-                            <button 
-                              type="button"
-                              onClick={addColor}
-                              className="flex-1 bg-[#73185e] text-white text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#5D134B] transition-all rounded-[2px]"
+                         <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Foto (Opcional)</label>
+                         <div className="flex gap-4 items-center">
+                            <div 
+                              onClick={() => colorImageInputRef.current?.click()}
+                              className="w-12 h-16 bg-white/60 border-2 border-dashed border-[#73185e]/10 flex flex-col items-center justify-center rounded-[2px] cursor-pointer hover:border-[#73185e]/30 overflow-hidden"
                             >
-                              Adicionar Cor
-                            </button>
+                               {uploadingColorImage ? (
+                                 <Loader2 className="w-4 h-4 text-[#73185e] animate-spin" />
+                               ) : newColorImageUrl ? (
+                                 <img src={newColorImageUrl} className="w-full h-full object-cover" />
+                               ) : (
+                                 <ImageIcon className="w-4 h-4 text-[#73185e]/20" />
+                               )}
+                            </div>
+                            <input 
+                              type="url" 
+                              value={newColorImageUrl}
+                              onChange={(e) => setNewColorImageUrl(e.target.value)}
+                              placeholder="Ou cole o link..."
+                              className="flex-1 px-4 py-2 bg-white/60 border border-transparent outline-none focus:ring-1 focus:ring-[#73185e] text-[9px] uppercase font-bold tracking-widest rounded-[2px]"
+                            />
                          </div>
+                      </div>
+
+                      <div className="flex gap-4">
+                          <input 
+                            type="color" 
+                            value={newColorHex}
+                            onChange={(e) => setNewColorHex(e.target.value)}
+                            className="w-12 h-12 bg-transparent border-none p-0 cursor-pointer rounded-[2px]"
+                          />
+                          <button 
+                            type="button"
+                            onClick={addColor}
+                            className="flex-1 bg-[#73185e] text-white text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#5D134B] transition-all rounded-[2px]"
+                          >
+                            Adicionar Cor
+                          </button>
                       </div>
                    </div>
                 </div>
 
-                {/* Colors List */}
                 <div className="space-y-4">
-                   <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Cores Ativas</label>
-                   <div className="flex flex-wrap gap-3">
-                      {colors.length === 0 && (
-                        <p className="text-[10px] text-[#73185e]/30 italic font-bold uppercase tracking-widest">Nenhuma cor selecionada</p>
-                      )}
+                   <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Status das Cores</label>
+                   <div className="grid grid-cols-1 gap-3">
                       {colors.map((color, idx) => (
-                        <div key={idx} className="flex items-center gap-2 pl-2 pr-1 py-1 bg-white rounded-[2px] border border-[#73185e]/5 shadow-sm group animate-in fade-in slide-in-from-left-2 duration-300">
-                           <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: color.hex }} />
-                           <span className="text-[10px] uppercase tracking-widest font-bold text-[#73185e]">{color.label}</span>
-                           <button 
-                            type="button"
-                            onClick={() => removeColor(idx)}
-                            className="p-1 hover:bg-rose-50 text-[#73185e]/20 hover:text-rose-500 rounded-full transition-colors"
-                           >
-                             <X className="w-3 h-3" />
-                           </button>
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white/80 rounded-[2px] border border-[#73185e]/5 group">
+                           <div className="flex items-center gap-3">
+                              <div className="w-4 h-4 rounded-full border border-black/5" style={{ backgroundColor: color.hex }} />
+                              <span className={cn(
+                                "text-[10px] uppercase font-bold tracking-widest",
+                                color.isAvailable ? "text-[#73185e]" : "text-zinc-300 line-through"
+                              )}>{color.label}</span>
+                           </div>
+                           <div className="flex items-center gap-4">
+                              <button 
+                                type="button"
+                                onClick={() => toggleColorAvailability(idx)}
+                                className={cn(
+                                  "text-[8px] uppercase font-bold px-2 py-1 rounded-[1px] tracking-widest transition-colors",
+                                  color.isAvailable ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-rose-50 text-rose-500 border border-rose-100"
+                                )}
+                              >
+                                {color.isAvailable ? "Disponível" : "Esgotado"}
+                              </button>
+                              <button onClick={() => removeColor(idx)} className="text-[#73185e]/20 hover:text-rose-500 transition-colors">
+                                 <X className="w-3 h-3" />
+                              </button>
+                           </div>
                         </div>
                       ))}
                    </div>
@@ -357,24 +434,81 @@ export default function AdminNovoProduto() {
              </div>
           </div>
 
+          {/* Section 3: Sizes & Availability */}
+          <div className="bg-white/40 backdrop-blur-sm p-8 border border-[#73185e]/10 rounded-[4px] space-y-8">
+             <div className="flex items-center gap-4 border-b border-[#73185e]/5 pb-4">
+                <Ruler className="w-5 h-5 text-[#BFA054]" />
+                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#73185e]">Estoque por Tamanhos</h3>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-4">
+                   <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Novo Tamanho</label>
+                   <div className="flex gap-2">
+                      <input 
+                        value={newSizeLabel}
+                        onChange={(e) => setNewSizeLabel(e.target.value)}
+                        className="flex-1 px-4 py-3 bg-white/60 border border-transparent outline-none focus:ring-1 focus:ring-[#73185e] text-[10px] uppercase font-bold tracking-widest rounded-[2px]" 
+                        placeholder="Ex: PP, GG, 42"
+                      />
+                      <button 
+                        type="button"
+                        onClick={addSize}
+                        className="px-6 bg-[#BFA054] text-white text-[9px] uppercase font-bold tracking-widest rounded-[2px]"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                   </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                   {sizes.map((size, idx) => (
+                     <div key={idx} className="flex flex-col items-center gap-2">
+                        <button 
+                          type="button"
+                          onClick={() => toggleSizeAvailability(idx)}
+                          className={cn(
+                            "w-12 h-12 flex items-center justify-center text-[10px] font-bold transition-all border rounded-[2px]",
+                            size.isAvailable 
+                              ? "bg-white border-[#BFA054]/20 text-[#73185e]" 
+                              : "bg-zinc-100 border-zinc-200 text-zinc-300 line-through shadow-inner"
+                          )}
+                        >
+                          {size.label}
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => removeSize(idx)}
+                          className="opacity-0 hover:opacity-100 text-[8px] uppercase text-[#73185e]/40 hover:text-rose-500 font-bold transition-opacity"
+                        >
+                          Remover
+                        </button>
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </div>
+
           <div className="pt-4 flex justify-end gap-6 items-center">
-             <button 
-               type="button"
-               onClick={() => router.push("/admin/estoque")}
-               className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#73185e]/40 hover:text-[#73185e] transition-colors"
-             >
-               Cancelar
-             </button>
              <button 
                 type="submit"
                 disabled={saving || uploading}
                 className="px-20 py-6 bg-[#73185e] text-white text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#5D134B] transition-all flex items-center gap-4 shadow-xl shadow-[#73185e]/20 rounded-[2px]"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Publicar Peça"}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Publicar no Catálogo"}
               </button>
           </div>
         </div>
       </form>
+
+      {/* Hidden Inputs */}
+      <input 
+        type="file"
+        ref={colorImageInputRef}
+        onChange={(e) => handleFileChange(e, 'color')}
+        accept="image/*"
+        className="hidden"
+      />
     </div>
   );
 }
