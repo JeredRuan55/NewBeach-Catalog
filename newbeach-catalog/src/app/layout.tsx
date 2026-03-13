@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "NewBeach | Moda Feminina Sofisticada",
   description: "Descubra o minimalismo sofisticado da NewBeach. Linho, Alfaiataria e Curadoria de Qualidade.",
   keywords: ["moda feminina", "linho", "alfaiataria", "clean girl aesthetic", "roupas minimalistas"],
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 import { CartProvider } from "@/context/CartContext";

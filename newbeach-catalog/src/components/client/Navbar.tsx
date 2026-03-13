@@ -25,9 +25,14 @@ export function Navbar() {
         </div>
 
         {/* Logo */}
-        <div className="text-2xl font-bold tracking-tighter text-[#73185e] flex flex-col items-center">
-          <Link href="/" className="hover:scale-105 transition-transform">NEWBEACH</Link>
-          <span className="text-[8px] tracking-[0.6em] font-light mt-[-4px] text-[#BFA054]">PREMIUM</span>
+        <div className="flex flex-col items-center">
+          <Link href="/" className="flex flex-col items-center hover:scale-105 transition-transform">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="NewBeach Logo" className="w-8 h-8 object-contain brightness-[1.1]" />
+              <span className="text-2xl font-bold tracking-tighter text-[#73185e]">NEWBEACH</span>
+            </div>
+            <span className="text-[8px] tracking-[0.6em] font-light mt-[-2px] text-[#BFA054] ml-11">PREMIUM</span>
+          </Link>
         </div>
 
         {/* Desktop Links Right + Icons */}
