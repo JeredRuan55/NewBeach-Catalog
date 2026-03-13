@@ -187,48 +187,15 @@ export default function CartDrawer() {
                       <span className="text-[10px] uppercase tracking-widest font-bold">Cálculo de Frete</span>
                     </div>
 
-                    {!shippingAddress ? (
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <input 
-                            type="text"
-                            value={cep}
-                            onChange={(e) => setCep(e.target.value)}
-                            placeholder="Seu CEP (00000-000)"
-                            className="flex-1 bg-white/60 border border-[#73185e]/10 px-4 py-3 text-[11px] font-bold uppercase tracking-widest outline-none focus:ring-1 focus:ring-[#73185e] placeholder:text-[#73185e]/20"
-                            maxLength={9}
-                          />
-                          <button 
-                            onClick={handleCalculateShipping}
-                            disabled={isCalculating}
-                            className="bg-[#73185e] text-white px-6 py-3 text-[10px] uppercase font-bold hover:bg-[#5D134B] transition-all disabled:opacity-50"
-                          >
-                            {isCalculating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Calcular"}
-                          </button>
-                        </div>
-                        {error && <p className="text-[9px] text-rose-500 font-bold uppercase tracking-widest">{error}</p>}
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between group">
-                        <div className="flex items-start gap-3">
-                          <MapPin className="w-4 h-4 text-[#BFA054] mt-0.5" />
-                          <div>
-                            <p className="text-[11px] font-bold text-[#73185e] uppercase tracking-tight">
-                              {shippingAddress.localidade}, {shippingAddress.uf}
-                            </p>
-                            <p className="text-[9px] text-[#73185e]/60 font-medium line-clamp-1">
-                              {shippingAddress.logradouro}
-                            </p>
-                          </div>
-                        </div>
-                        <button 
-                          onClick={clearShipping}
-                          className="text-[9px] uppercase tracking-widest font-bold text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          Alterar
-                        </button>
-                      </div>
-                    )}
+                    <div className="py-2 px-4 bg-white/40 border border-dashed border-[#73185e]/10 rounded-sm">
+                      <p className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#73185e]/40 text-center italic">
+                        Cálculo automático em breve
+                      </p>
+                    </div>
+                    
+                    <p className="text-[8px] text-[#73185e]/40 uppercase tracking-widest font-bold text-center">
+                      Consulte o frete com o nosso atendimento via WhatsApp
+                    </p>
                   </div>
                 </>
               )}
