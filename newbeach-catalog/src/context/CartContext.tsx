@@ -3,11 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface CartItem {
-  id: string;
+  id: string; // This can be a composite key "originalId-color-size"
+  productId: string; // The base product ID
   name: string;
   price: number;
   image: string;
   quantity: number;
+  color?: string;
+  size?: string;
 }
 
 interface ShippingAddress {
@@ -84,6 +87,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (item: CartItem) => {
     setCart(currentCart => {
+      // Find if an item with the same ID (composite) already exists
       const existingItem = currentCart.find(i => i.id === item.id);
       if (existingItem) {
         return currentCart.map(i => 

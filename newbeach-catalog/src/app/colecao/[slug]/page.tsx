@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { Filter, SlidersHorizontal } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { useCart } from "@/context/CartContext";
 import { ProductCard } from "@/components/client/ProductCard";
 
 interface Product {
@@ -47,20 +46,6 @@ export default function CollectionPage() {
     fetchProducts();
   }, [slug]);
 
-  const { addItem } = useCart();
-
-  const handleAddToCart = (product: Product) => {
-    if (product.stock_status === 'sold_out') return;
-    
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images?.[0] || 'https://via.placeholder.com/300x400',
-      quantity: 1
-    });
-  };
-
   return (
     <main className="min-h-screen pt-32 px-6 md:px-12 bg-[#FCFBF7]">
       <Navbar />
@@ -94,7 +79,6 @@ export default function CollectionPage() {
             key={product.id} 
             product={product} 
             index={i} 
-            onAddToCart={() => handleAddToCart(product)}
             stockStatus={product.stock_status}
           />
         ))}

@@ -58,11 +58,11 @@ export default function CartDrawer() {
 
   const handleCheckoutWhatsApp = () => {
     const message = `Olá NewBeach! Gostaria de fazer um pedido:\n\n` +
-      cart.map(item => `- ${item.name} (${item.quantity}x)`).join('\n') +
+      cart.map(item => `- ${item.name}${item.color ? ` (Cor: ${item.color})` : ''}${item.size ? ` (Tam: ${item.size})` : ''} - Qtd: ${item.quantity}`).join('\n') +
       `\n\nSubtotal: ${formatCurrency(totalPrice)}` +
       (shippingAddress ? `\nFrete para ${shippingAddress.localidade}/${shippingAddress.uf}: ${shippingFee > 0 ? formatCurrency(shippingFee) : 'GRÁTIS'}\nTotal: ${formatCurrency(totalPrice + shippingFee)}` : '') +
       (shippingAddress ? `\n\nEndereço: ${shippingAddress.logradouro}, ${shippingAddress.bairro}, ${shippingAddress.localidade}-${shippingAddress.uf}` : '') +
-      `\n\nAguardo confirmação de tamanho e cores! ✨`;
+      `\n\nAguardo confirmação! ✨`;
     
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/5548999999999?text=${encoded}`, '_blank');
@@ -140,7 +140,19 @@ export default function CartDrawer() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
-                            <p className="text-xs font-bold text-[#BFA054] mt-1">{formatCurrency(item.price)}</p>
+                            <div className="flex gap-2 mt-1">
+                               {item.color && (
+                                 <span className="text-[8px] uppercase font-bold tracking-widest px-2 py-0.5 bg-white/40 text-[#73185e]/60 rounded-full border border-[#73185e]/5">
+                                    Cor: {item.color}
+                                 </span>
+                               )}
+                               {item.size && (
+                                 <span className="text-[8px] uppercase font-bold tracking-widest px-2 py-0.5 bg-white/40 text-[#73185e]/60 rounded-full border border-[#73185e]/5">
+                                    Tam: {item.size}
+                                 </span>
+                               )}
+                            </div>
+                            <p className="text-xs font-bold text-[#BFA054] mt-2">{formatCurrency(item.price)}</p>
                           </div>
                           
                           <div className="flex items-center justify-between">
