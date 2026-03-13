@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Filter, MoreHorizontal, Power, PowerOff, Star } from "lucide-react";
+import { Plus, Search, Filter, Pencil, Power, PowerOff, Star } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import LinkNext from "next/link";
@@ -153,7 +153,12 @@ export default function AdminEstoque() {
                     </button>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button className="text-[#73185e]/40 hover:text-[#73185e] transition-colors"><MoreHorizontal className="w-5 h-5" /></button>
+                    <LinkNext 
+                      href={`/admin/estoque/${p.id}`}
+                      className="inline-flex items-center gap-2 text-[#73185e]/40 hover:text-[#73185e] transition-colors text-[9px] uppercase tracking-widest font-bold"
+                    >
+                      <Pencil className="w-4 h-4" /> Editar
+                    </LinkNext>
                   </td>
                 </tr>
               ))}
