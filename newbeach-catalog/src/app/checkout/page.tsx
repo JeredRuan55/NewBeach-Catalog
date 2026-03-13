@@ -51,7 +51,7 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const finalTotal = (totalPrice * (paymentMethod === 'pix' ? 0.95 : 1)) + shippingFee;
+      const finalTotal = (totalPrice * (paymentMethod === 'pix' ? 0.95 : 1)) + (paymentMethod === 'pix' ? 0 : shippingFee);
 
       const orderData = {
         customer_name: formData.name,
@@ -138,40 +138,42 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              {/* Delivery Info */}
-              <section className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-[#73185e]/10 pb-4">
-                  <div className="w-6 h-6 rounded-full bg-[#73185e] text-white text-[10px] flex items-center justify-center font-bold">2</div>
-                  <h2 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#73185e]">Entrega</h2>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">CEP</label>
-                    <input required name="address.cep" value={formData.address.cep} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+              {/* Delivery Info - Hidden for PIX as requested */}
+              {paymentMethod !== 'pix' && (
+                <section className="space-y-6">
+                  <div className="flex items-center gap-3 border-b border-[#73185e]/10 pb-4">
+                    <div className="w-6 h-6 rounded-full bg-[#73185e] text-white text-[10px] flex items-center justify-center font-bold">2</div>
+                    <h2 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#73185e]">Entrega</h2>
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Endereço (Rua/Avenida)</label>
-                    <input required name="address.logradouro" value={formData.address.logradouro} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">CEP</label>
+                      <input required name="address.cep" value={formData.address.cep} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Endereço (Rua/Avenida)</label>
+                      <input required name="address.logradouro" value={formData.address.logradouro} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Número</label>
+                      <input required name="address.numero" value={formData.address.numero} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Complemento</label>
+                      <input name="address.complemento" value={formData.address.complemento} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Cidade</label>
+                      <input required name="address.cidade" value={formData.address.cidade} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">UF</label>
+                      <input required name="address.uf" value={formData.address.uf} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Número</label>
-                    <input required name="address.numero" value={formData.address.numero} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Complemento</label>
-                    <input name="address.complemento" value={formData.address.complemento} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">Cidade</label>
-                    <input required name="address.cidade" value={formData.address.cidade} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-[#73185e]/60">UF</label>
-                    <input required name="address.uf" value={formData.address.uf} onChange={handleInputChange} className="w-full bg-white border border-[#73185e]/10 px-4 py-4 text-xs font-bold text-[#73185e] outline-none focus:border-[#73185e]" />
-                  </div>
-                </div>
-              </section>
+                </section>
+              )}
 
               {/* Payment Info */}
               <section className="space-y-6">
@@ -243,10 +245,12 @@ export default function CheckoutPage() {
                 <span>Subtotal</span>
                 <span>{formatCurrency(totalPrice)}</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-[#73185e]/60">
-                <span className="flex items-center gap-2"><Truck className="w-3 h-3" /> Frete</span>
-                <span>{shippingFee === 0 ? 'GRÁTIS' : formatCurrency(shippingFee)}</span>
-              </div>
+              {paymentMethod !== 'pix' && (
+                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-[#73185e]/60">
+                  <span className="flex items-center gap-2"><Truck className="w-3 h-3" /> Frete</span>
+                  <span>{shippingFee === 0 ? 'GRÁTIS' : formatCurrency(shippingFee)}</span>
+                </div>
+              )}
               {paymentMethod === 'pix' && (
                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-emerald-600">
                   <span>Desconto PIX (5%)</span>
@@ -256,7 +260,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between items-end pt-4">
                 <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#73185e]">Total Final</span>
                 <span className="text-3xl font-bold tracking-tighter text-[#73185e] font-playfair italic">
-                  {formatCurrency((totalPrice * (paymentMethod === 'pix' ? 0.95 : 1)) + shippingFee)}
+                  {formatCurrency((totalPrice * (paymentMethod === 'pix' ? 0.95 : 1)) + (paymentMethod === 'pix' ? 0 : shippingFee))}
                 </span>
               </div>
             </div>
