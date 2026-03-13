@@ -65,7 +65,7 @@ export default function CartDrawer() {
       `\n\nAguardo confirmação! ✨`;
     
     const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/5548999999999?text=${encoded}`, '_blank');
+    window.open(`https://wa.me/5511946664228?text=${encoded}`, '_blank');
   };
 
   return (
