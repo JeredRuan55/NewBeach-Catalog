@@ -54,7 +54,7 @@ export function ProductCard({ product, index, stockStatus = 'available' }: Produ
       className="group cursor-pointer"
     >
       <Link href={`/produto/${product.id}`} className="block">
-        <div className="relative aspect-[3/4] overflow-hidden mb-8 bg-white shadow-2xl shadow-black/5 border border-[#F0E6E9] group-hover:border-[#BFA054]/20 transition-all">
+        <div className="relative aspect-[3/4] overflow-hidden mb-4 md:mb-8 bg-white shadow-2xl shadow-black/5 border border-[#F0E6E9] group-hover:border-[#BFA054]/20 transition-all">
           {/* Main Image */}
           <AnimatePresence mode="wait">
             <motion.img 
@@ -89,20 +89,20 @@ export function ProductCard({ product, index, stockStatus = 'available' }: Produ
             </div>
           )}
 
-          {/* Hover Action Label */}
-          <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-all duration-500 bg-white/90 backdrop-blur-md z-30">
+          {/* Hover Action Label - Desktop Only or subtle on mobile */}
+          <div className="absolute inset-x-0 bottom-0 p-2 md:p-4 translate-y-full group-hover:translate-y-0 transition-all duration-500 bg-white/90 backdrop-blur-md z-30">
             <div className={cn(
-              "w-full py-4 text-[9px] uppercase tracking-[0.3em] font-bold transition-all text-center flex items-center justify-center gap-2",
+              "w-full py-2 md:py-4 text-[8px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold transition-all text-center flex items-center justify-center gap-2",
               isSoldOut 
                   ? "bg-zinc-100 text-zinc-400" 
                   : "bg-[#73185e] text-white"
             )}>
-                {isSoldOut ? "Indisponível" : <><ShoppingBag className="w-3.5 h-3.5" /> Ver Detalhes</>}
+                {isSoldOut ? "Indisponível" : <><ShoppingBag className="w-3 md:w-3.5 h-3 md:h-3.5" /> Ver Detalhes</>}
             </div>
           </div>
         </div>
 
-        <div className="space-y-4 text-center">
+        <div className="space-y-2 md:space-y-4 text-center">
           {/* Colors selector (visual only on card, selection happens on page) */}
           <div className="flex justify-center gap-2 h-4 items-center">
             {product.colors && product.colors.length > 0 && product.colors.map((color, idx) => (

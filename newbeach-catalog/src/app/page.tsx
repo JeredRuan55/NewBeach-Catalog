@@ -136,7 +136,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-6xl md:text-[10rem] font-bold tracking-tighter text-white leading-[0.85] mix-blend-overlay"
+              className="text-5xl md:text-[10rem] font-bold tracking-tighter text-white leading-[0.85] mix-blend-overlay"
             >
               NEW <br />
               <span className="font-playfair italic font-normal text-[#BFA054] mix-blend-normal">BEACH</span>
@@ -159,7 +159,7 @@ export default function Home() {
           >
             <Link 
               href="/colecoes" 
-              className="group relative inline-flex items-center gap-10 px-12 py-6 bg-white text-[#73185e] text-[10px] uppercase tracking-[0.4em] font-bold shadow-2xl hover:bg-[#73185e] hover:text-white transition-all duration-500"
+              className="group relative inline-flex items-center gap-6 md:gap-10 px-8 md:px-12 py-4 md:py-6 bg-white text-[#73185e] text-[9px] md:text-[10px] uppercase tracking-[0.4em] font-bold shadow-2xl hover:bg-[#73185e] hover:text-white transition-all duration-500"
             >
               <span className="relative z-10">Explorar Curadoria</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
@@ -214,7 +214,7 @@ export default function Home() {
              </Link>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-16">
             {featuredProducts.length > 0 ? (
               featuredProducts.map((product, i) => (
                 <ProductCard key={product.id} product={product} index={i} />

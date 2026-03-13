@@ -134,8 +134,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
          </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16">
             
             {/* Gallery Section */}
             <div className="lg:col-span-1 hidden lg:flex flex-col gap-4">
@@ -194,11 +194,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             <div className="lg:col-span-5 space-y-12">
                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                     <span className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#BFA054] px-3 py-1 bg-[#BFA054]/5 rounded-sm">Premium Selection</span>
+                     <span className="text-[8px] md:text-[9px] uppercase tracking-[0.3em] font-bold text-[#BFA054] px-3 py-1 bg-[#BFA054]/5 rounded-sm">Premium Selection</span>
                      <span className="w-8 h-[1px] bg-[#73185e]/10"></span>
                   </div>
-                  <h1 className="text-4xl font-bold tracking-tighter text-[#73185e] font-playfair">{product.name}</h1>
-                  <p className="text-2xl font-bold text-[#BFA054] font-playfair italic">{formatCurrency(product.price)}</p>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-[#73185e] font-playfair">{product.name}</h1>
+                  <p className="text-xl md:text-2xl font-bold text-[#BFA054] font-playfair italic">{formatCurrency(product.price)}</p>
                </div>
 
                <div className="space-y-6 text-[11px] leading-relaxed text-[#73185e]/70 uppercase tracking-widest font-medium">
@@ -292,11 +292,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                {/* Actions */}
                <div className="space-y-4 pt-4">
-                  <button 
+                   <button 
                     onClick={handleAddToCart}
                     disabled={adding || product.stock_status === 'sold_out'}
                     className={cn(
-                       "w-full h-20 flex items-center justify-center gap-4 text-[11px] uppercase tracking-[0.4em] font-bold transition-all shadow-2xl relative overflow-hidden",
+                       "w-full h-16 md:h-20 flex items-center justify-center gap-4 text-[10px] md:text-[11px] uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold transition-all shadow-2xl relative overflow-hidden",
                        product.stock_status === 'sold_out' 
                         ? "bg-zinc-100 text-zinc-400 cursor-not-allowed" 
                         : "bg-[#73185e] text-white hover:bg-[#5D134B] shadow-[#73185e]/10"
