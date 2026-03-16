@@ -17,8 +17,9 @@ export default function AdminCategorias() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   
-  // New Category State
+  // Category Form State
   const [newName, setNewName] = useState("");
   const [newSlug, setNewSlug] = useState("");
   const [saving, setSaving] = useState(false);
@@ -38,24 +39,51 @@ export default function AdminCategorias() {
     setLoading(false);
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const openCreateModal = () => {
+    setEditingCategory(null);
+    setNewName("");
+    setNewSlug("");
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (cat: Category) => {
+    setEditingCategory(cat);
+    setNewName(cat.name);
+    setNewSlug(cat.slug);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     const slug = newSlug || newName.toLowerCase().replace(/ /g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const { data, error } = await supabase
-      .from('categories')
-      .insert([{ name: newName, slug, is_active: true }])
-      .select();
+    if (editingCategory) {
+      const { data, error } = await supabase
+        .from('categories')
+        .update({ name: newName, slug })
+        .eq('id', editingCategory.id)
+        .select();
 
-    if (error) {
-      alert("Erro ao criar categoria: " + error.message);
-    } else if (data) {
-      setCategories([data[0], ...categories]);
-      setIsModalOpen(false);
-      setNewName("");
-      setNewSlug("");
+      if (error) {
+        alert("Erro ao editar categoria: " + error.message);
+      } else if (data) {
+        setCategories(categories.map(c => c.id === editingCategory.id ? data[0] : c));
+        setIsModalOpen(false);
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([{ name: newName, slug, is_active: true }])
+        .select();
+
+      if (error) {
+        alert("Erro ao criar categoria: " + error.message);
+      } else if (data) {
+        setCategories([data[0], ...categories]);
+        setIsModalOpen(false);
+      }
     }
     setSaving(false);
   };
@@ -96,7 +124,7 @@ export default function AdminCategorias() {
           <p className="text-[#73185e]/60 text-[11px] uppercase tracking-widest font-bold mt-2">Crie novas coleções (Linho, Alfaiataria, Marant) para seu catálogo.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={openCreateModal}
           className="flex items-center gap-3 bg-[#73185e] text-white px-8 py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#5D134B] transition-all shadow-lg shadow-[#73185e]/20 rounded-[4px]"
         >
           <Plus className="w-4 h-4" /> Nova Categoria
@@ -134,8 +162,8 @@ export default function AdminCategorias() {
                     </button>
                   </td>
                   <td className="px-8 py-6 text-right space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="text-[#73185e]/60 inline-flex hover:text-[#73185e]"><Edit3 className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(cat.id)} className="text-rose-300 inline-flex hover:text-rose-600"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openEditModal(cat)} className="text-[#73185e]/60 inline-flex hover:text-[#73185e]" title="Editar Categoria"><Edit3 className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(cat.id)} className="text-rose-300 inline-flex hover:text-rose-600" title="Excluir Categoria"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -156,11 +184,11 @@ export default function AdminCategorias() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#73185e]/5 backdrop-blur-sm p-6 animate-in fade-in duration-300">
           <div className="bg-white border border-[#73185e]/10 w-full max-w-md p-10 shadow-2xl space-y-8 rounded-[4px]">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-3xl font-bold tracking-tighter text-[#73185e]">Nova <span className="font-playfair italic font-normal text-[#BFA054]">Categoria</span></h2>
+              <h2 className="text-3xl font-bold tracking-tighter text-[#73185e]">{editingCategory ? "Editar" : "Nova"} <span className="font-playfair italic font-normal text-[#BFA054]">Categoria</span></h2>
               <button onClick={() => setIsModalOpen(false)} className="text-[#73185e]/40 hover:text-[#73185e] mt-[-20px]"><X className="w-5 h-5" /></button>
             </div>
 
-            <form onSubmit={handleCreate} className="space-y-8">
+            <form onSubmit={handleSave} className="space-y-8">
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-[#73185e]/60">Nome da Coleção</label>
                 <input 
@@ -189,7 +217,7 @@ export default function AdminCategorias() {
                   disabled={saving}
                   className="w-full py-5 bg-[#73185e] text-white text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#5D134B] transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#73185e]/20 rounded-[2px]"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : "Salvar Coleção"}
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : (editingCategory ? "Salvar Alterações" : "Salvar Coleção")}
                 </button>
               </div>
             </form>

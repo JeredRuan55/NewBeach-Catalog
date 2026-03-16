@@ -90,17 +90,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#FCFBF7]">
-      {/* Announcement Bar */}
-      <div className="bg-[#73185e] py-2 text-center overflow-hidden border-b border-white/10 z-[60] relative">
-        <motion.p 
-          initial={{ x: "100%" }}
-          animate={{ x: "-100%" }}
-          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-          className="text-[9px] uppercase tracking-[0.4em] font-bold text-white whitespace-nowrap"
-        >
-          ENVIAMOS PARA TODO O BRASIL — 5% OFF NO PIX — CURADORIA EXCLUSIVA NEWBEACH
-        </motion.p>
-      </div>
 
       <Navbar />
 
