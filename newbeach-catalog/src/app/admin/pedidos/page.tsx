@@ -22,7 +22,9 @@ export default function AdminPedidos() {
   
   // Modal State
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -96,6 +98,11 @@ export default function AdminPedidos() {
       setSelectedOrderId(null);
     }
     setIsSubmitting(false);
+  };
+
+  const openDetails = (order: Order) => {
+    setViewingOrder(order);
+    setIsDetailsModalOpen(true);
   };
 
   const statusIcons: Record<string, any> = {
@@ -252,7 +259,11 @@ export default function AdminPedidos() {
                     <XCircle className="w-4 h-4" />
                   </button>
                 )}
-                <button className="p-4 bg-[#73185e] text-white hover:bg-[#5D134B] transition-all rounded-[2px] shadow-lg shadow-[#73185e]/20" title="Ver Detalhes">
+                 <button 
+                  onClick={() => openDetails(order)}
+                  className="p-4 bg-[#73185e] text-white hover:bg-[#5D134B] transition-all rounded-[2px] shadow-lg shadow-[#73185e]/20" 
+                  title="Ver Detalhes"
+                >
                   <Eye className="w-4 h-4" />
                 </button>
               </div>
@@ -314,6 +325,115 @@ export default function AdminPedidos() {
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirmar Cancelamento"}
               </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {isDetailsModalOpen && viewingOrder && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white w-full max-w-2xl p-8 rounded shadow-2xl border border-[#73185e]/10 relative max-h-[90vh] overflow-y-auto"
+          >
+            <button 
+              onClick={() => setIsDetailsModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-[#73185e]/40 hover:text-[#73185e] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <header className="mb-8 border-b border-[#73185e]/5 pb-6">
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-[#BFA054] mb-2">
+                <CheckCircle2 className="w-4 h-4" /> Pedido #{(viewingOrder.id.split('-')[0]).toUpperCase()}
+              </div>
+              <h2 className="text-3xl font-bold tracking-tighter text-[#73185e]">Detalhes da <span className="font-playfair italic font-normal text-[#BFA054]">Reserva</span></h2>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* Items Section */}
+              <div className="space-y-6">
+                <h3 className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">Itens do Pedido</h3>
+                <div className="space-y-4">
+                  {viewingOrder.items?.map((item: any, idx: number) => (
+                    <div key={idx} className="flex gap-4 items-center bg-[#73185e]/5 p-3 rounded-[2px]">
+                      <div className="w-12 h-16 bg-white overflow-hidden flex-shrink-0">
+                        <img src={item.image} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] font-bold text-[#73185e] uppercase tracking-wider">{item.name}</p>
+                        <div className="flex gap-3 text-[9px] text-[#73185e]/60 font-medium uppercase mt-1">
+                          {item.color && <span>Cor: {item.color}</span>}
+                          {item.size && <span>Tam: {item.size}</span>}
+                        </div>
+                        <p className="text-[10px] font-bold text-[#BFA054] mt-1">{item.quantity}x {formatCurrency(item.price)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="pt-4 border-t border-[#73185e]/5">
+                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[#73185e]">
+                      <span>Valor Total</span>
+                      <span className="text-xl font-playfair italic text-[#BFA054]">{formatCurrency(viewingOrder.total_amount)}</span>
+                   </div>
+                </div>
+              </div>
+
+              {/* Customer Info Section */}
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h3 className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">Cliente</h3>
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-[#73185e] uppercase tracking-widest">{viewingOrder.customer_name}</p>
+                    <p className="text-[10px] text-[#73185e]/60 font-medium tracking-wider">{(viewingOrder as any).customer_email}</p>
+                    <p className="text-[10px] font-bold text-[#BFA054] tracking-widest">{(viewingOrder as any).customer_whatsapp}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">Entrega</h3>
+                  {(viewingOrder as any).shipping_address ? (
+                    <div className="text-[10px] text-[#73185e] space-y-1 uppercase font-bold tracking-widest leading-relaxed">
+                      <p>{(viewingOrder as any).shipping_address.logradouro}, {(viewingOrder as any).shipping_address.numero}</p>
+                      <p>{(viewingOrder as any).shipping_address.complemento}</p>
+                      <p>{(viewingOrder as any).shipping_address.bairro}</p>
+                      <p>{(viewingOrder as any).shipping_address.cidade} - {(viewingOrder as any).shipping_address.uf}</p>
+                      <p className="text-[#BFA054]">CEP: {(viewingOrder as any).shipping_address.cep}</p>
+                    </div>
+                  ) : (
+                    <p className="text-[10px] italic text-[#73185e]/40 font-bold uppercase tracking-widest">Entrega a combinar via WhatsApp</p>
+                  )}
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-[#73185e]/5">
+                   <h3 className="text-[11px] uppercase tracking-widest font-bold text-[#73185e]">Pagamento</h3>
+                   <div className="flex items-center gap-3">
+                      {(viewingOrder as any).payment_method === 'pix' ? (
+                        <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
+                           <QrCode className="w-4 h-4" />
+                           <span className="text-[9px] uppercase tracking-widest font-bold">PIX DIRETO (PAGO)</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-[#73185e]/60 bg-[#73185e]/5 px-4 py-2 rounded-full border border-[#73185e]/10">
+                           <User className="w-4 h-4" />
+                           <span className="text-[9px] uppercase tracking-widest font-bold">WHATSAPP / A COMBINAR</span>
+                        </div>
+                      )}
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12">
+               <button 
+                onClick={() => setIsDetailsModalOpen(false)}
+                className="w-full py-5 bg-[#73185e] text-white text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-[#5D134B] transition-all"
+               >
+                 Fechar Detalhes
+               </button>
             </div>
           </motion.div>
         </div>
