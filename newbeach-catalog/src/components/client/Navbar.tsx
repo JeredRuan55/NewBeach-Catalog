@@ -12,20 +12,20 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-nav px-4 md:px-12 py-3 md:py-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-3 items-center">
-        <div className="flex justify-start">
+      <div className="max-w-7xl mx-auto flex items-center justify-between relative">
+        {/* Left Side (Menu/Links) */}
+        <div className="flex flex-1 justify-start">
           <div className="md:hidden">
             <Menu className="w-5 h-5 text-[#73185e] cursor-pointer" />
           </div>
-          
-          {/* Desktop Links Left */}
           <div className="hidden md:flex items-center space-x-8 text-[10px] font-bold uppercase tracking-widest text-[#73185e]/70">
             <Link href="/colecoes" className="hover:text-[#BFA054] transition-colors cursor-pointer">Coleções</Link>
             <Link href="/sobre" className="hover:text-[#BFA054] transition-colors cursor-pointer">Sobre</Link>
           </div>
         </div>
 
-        <div className="flex justify-center flex-shrink-0">
+        {/* Logo (Absolute Center) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center z-10">
           <Link href="/" className="flex flex-col items-center hover:scale-105 transition-transform">
             <div className="flex items-center gap-2 md:gap-3">
               <img src="/logo.png" alt="NewBeach Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-[1.1]" />
@@ -35,7 +35,8 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center justify-end space-x-4 md:space-x-8">
+        {/* Right Side (Icons) */}
+        <div className="flex flex-1 items-center justify-end space-x-4 md:space-x-8">
           <Search className="w-5 h-5 text-[#73185e] cursor-pointer hidden md:block hover:text-[#BFA054] transition-colors" />
           <User className="w-4 h-4 md:w-5 md:h-5 text-[#73185e] cursor-pointer hover:text-[#BFA054] transition-colors" />
           <div 
