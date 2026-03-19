@@ -11,10 +11,10 @@ export function Navbar() {
   const { totalItems, openCart } = useCart();
 
   return (
-    <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-nav px-4 md:px-12 py-3 md:py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between relative">
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-nav py-3 md:py-4 h-16 md:h-20">
+      <div className="max-w-7xl mx-auto grid grid-cols-3 items-center h-full px-4 md:px-12 relative">
         {/* Left Side (Menu/Links) */}
-        <div className="flex flex-1 justify-start">
+        <div className="flex justify-start">
           <div className="md:hidden">
             <Menu className="w-5 h-5 text-[#73185e] cursor-pointer" />
           </div>
@@ -24,19 +24,11 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Logo (Absolute Center) */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center z-10">
-          <Link href="/" className="flex flex-col items-center hover:scale-105 transition-transform">
-            <div className="flex items-center gap-2 md:gap-3">
-              <img src="/logo.png" alt="NewBeach Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-[1.1]" />
-              <span className="text-lg md:text-2xl font-bold tracking-tighter text-[#73185e]">NEWBEACH</span>
-            </div>
-            <span className="text-[6px] md:text-[8px] tracking-[0.4em] md:tracking-[0.6em] font-light mt-[-2px] text-[#BFA054] md:ml-11">PREMIUM</span>
-          </Link>
-        </div>
+        {/* Empty middle for Logo centering */}
+        <div className="pointer-events-none" />
 
         {/* Right Side (Icons) */}
-        <div className="flex flex-1 items-center justify-end space-x-4 md:space-x-8">
+        <div className="flex items-center justify-end space-x-4 md:space-x-8">
           <Search className="w-5 h-5 text-[#73185e] cursor-pointer hidden md:block hover:text-[#BFA054] transition-colors" />
           <User className="w-4 h-4 md:w-5 md:h-5 text-[#73185e] cursor-pointer hover:text-[#BFA054] transition-colors" />
           <div 
@@ -50,6 +42,17 @@ export function Navbar() {
               </span>
             )}
           </div>
+        </div>
+
+        {/* Logo (Perfect Absolute Center) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+          <Link href="/" className="flex flex-col items-center hover:scale-105 transition-transform">
+            <div className="flex items-center gap-2 md:gap-3">
+              <img src="/logo.png" alt="NewBeach Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-[1.1]" />
+              <span className="text-lg md:text-2xl font-bold tracking-tighter text-[#73185e]">NEWBEACH</span>
+            </div>
+            <span className="text-[6px] md:text-[8px] tracking-[0.4em] md:tracking-[0.6em] font-light mt-[-2px] text-[#BFA054] md:ml-11">PREMIUM</span>
+          </Link>
         </div>
       </div>
     </nav>
