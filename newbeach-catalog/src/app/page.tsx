@@ -97,9 +97,10 @@ export default function Home() {
       <section className="relative h-[95vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
            {/* Storefront Hero Background */}
-           <div 
-             className="w-full h-full bg-cover bg-center brightness-[0.85]" 
-             style={{ backgroundImage: `url("/storefront.jpg")` }}
+           <img 
+             src="/storefront.jpg?v=1" 
+             alt="NewBeach storefront"
+             className="w-full h-full object-cover brightness-[0.85]" 
            />
            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#FCFBF7]" />
         </div>
