@@ -98,11 +98,11 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
            {/* Storefront Hero Background */}
            <img 
-             src="/storefront.jpg?v=1" 
+             src="/hero-store.jpg?v=10" 
              alt="NewBeach storefront"
-             className="w-full h-full object-cover brightness-[0.85]" 
+             className="w-full h-full object-cover" 
            />
-           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#FCFBF7]" />
+           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#FCFBF7]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center space-y-12">
@@ -116,21 +116,11 @@ export default function Home() {
               {activeCampaign ? "Coleção Ativa" : "Sua Próxima Escolha"}
             </motion.span>
             
-            <motion.h1 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 1 }}
-              className="text-5xl md:text-[10rem] font-bold tracking-tighter text-white leading-[0.85] mix-blend-overlay"
-            >
-              NEW <br />
-              <span className="font-playfair italic font-normal text-[#BFA054] mix-blend-normal">BEACH</span>
-            </motion.h1>
-            
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 1 }}
-              className="max-w-md mx-auto text-white/80 text-sm leading-relaxed uppercase tracking-[0.3em] font-bold"
+              className="max-w-md mx-auto text-white text-sm leading-relaxed uppercase tracking-[0.3em] font-bold drop-shadow-lg"
             >
               {activeCampaign?.subtitle || "O encontro entre a sofisticação atemporal e o design contemporâneo."}
             </motion.p>
