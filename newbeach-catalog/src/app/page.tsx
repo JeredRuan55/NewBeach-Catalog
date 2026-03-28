@@ -99,7 +99,7 @@ export default function Home() {
            {/* Storefront Hero Background */}
            <div 
              className="w-full h-full bg-cover bg-center brightness-[0.85]" 
-             style={{ backgroundImage: `url(${activeCampaign?.banner_url || "/storefront.jpg"})` }}
+             style={{ backgroundImage: `url("/storefront.jpg")` }}
            />
            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#FCFBF7]" />
         </div>
