@@ -193,16 +193,30 @@ export default function Home() {
             </header>
             
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-               {[1,2,3,4,5,6].map((n) => (
-                 <div key={n} className="aspect-square bg-zinc-200 overflow-hidden relative group">
+               {[
+                 "photo-1490481651871-ab68de25d43d",
+                 "photo-1539109139133-e449ea30e03a",
+                 "photo-1485230895905-ec40ba36b9bc",
+                 "photo-1542060717-d7ca14529ed7",
+                 "photo-1515886657613-9160e14e273c",
+                 "photo-1509042239860-f550ce710b93"
+               ].map((id, n) => (
+                 <a 
+                   key={n} 
+                   href="https://www.instagram.com/newbeach2/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="aspect-square bg-zinc-200 overflow-hidden relative group cursor-pointer"
+                 >
                     <img 
-                      src={`https://images.unsplash.com/photo-${1515886657613 + n}-9160e14e273c?auto=format&fit=crop&q=60&w=400`} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
+                      src={`https://images.unsplash.com/${id}?auto=format&fit=crop&q=80&w=600`} 
+                      alt="Fashion post"
+                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110" 
                     />
                     <div className="absolute inset-0 bg-[#73185e]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                        <Instagram className="w-6 h-6 text-white" />
                     </div>
-                 </div>
+                 </a>
                ))}
             </div>
          </div>
