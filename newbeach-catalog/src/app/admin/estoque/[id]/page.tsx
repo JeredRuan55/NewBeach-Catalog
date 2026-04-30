@@ -23,6 +23,7 @@ interface Color {
 interface Size {
   label: string;
   isAvailable: boolean;
+  quantities?: Record<string, number>;
 }
 
 export default function AdminEditarProduto({ params }: { params: Promise<{ id: string }> }) {
@@ -143,6 +144,13 @@ export default function AdminEditarProduto({ params }: { params: Promise<{ id: s
 
   const removeSize = (index: number) => {
     setSizes(sizes.filter((_, i) => i !== index));
+  };
+
+  const updateSizeQuantity = (sIdx: number, cLabel: string, qty: number) => {
+    const updated = [...sizes];
+    if (!updated[sIdx].quantities) updated[sIdx].quantities = {};
+    updated[sIdx].quantities[cLabel] = qty;
+    setSizes(updated);
   };
 
   const removeImage = (index: number) => {
@@ -538,8 +546,46 @@ export default function AdminEditarProduto({ params }: { params: Promise<{ id: s
                      </div>
                    ))}
                 </div>
-             </div>
-          </div>
+              </div>
+              
+              {/* Advanced Stock Matrix */}
+              {(colors.length > 0 && sizes.length > 0) && (
+                <div className="mt-8 overflow-x-auto border border-[#73185e]/5 rounded-[2px] bg-white">
+                   <table className="w-full text-left text-[10px] uppercase tracking-widest">
+                     <thead>
+                       <tr className="border-b border-[#73185e]/10 text-[#73185e] bg-zinc-50">
+                         <th className="py-3 px-4 font-bold border-r border-[#73185e]/10">Tamanho \ Cor</th>
+                         {colors.map(color => (
+                           <th key={color.label} className="py-3 px-4 text-center font-bold">Qtd. {color.label}</th>
+                         ))}
+                       </tr>
+                     </thead>
+                     <tbody className="divide-y divide-[#73185e]/5">
+                       {sizes.map((size, sIdx) => (
+                         <tr key={size.label}>
+                           <td className="py-3 px-4 font-bold text-[#73185e] border-r border-[#73185e]/10">{size.label}</td>
+                           {colors.map(color => {
+                             const val = size.quantities?.[color.label] ?? '';
+                             return (
+                               <td key={color.label} className="py-3 px-4 text-center">
+                                 <input 
+                                   type="number" 
+                                   min="0"
+                                   placeholder="0"
+                                   value={val}
+                                   onChange={(e) => updateSizeQuantity(sIdx, color.label, parseInt(e.target.value) || 0)}
+                                   className="w-16 px-2 py-1.5 text-center bg-white border border-[#73185e]/20 outline-none focus:ring-1 focus:ring-[#73185e] rounded-[2px] text-[#73185e] font-bold"
+                                 />
+                               </td>
+                             );
+                           })}
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                </div>
+              )}
+           </div>
 
           {/* Section 4: Materials Tags */}
           <div className="bg-white/40 backdrop-blur-sm p-8 border border-[#73185e]/10 rounded-[4px] space-y-8">
